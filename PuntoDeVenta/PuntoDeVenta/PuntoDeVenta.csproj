@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -228,6 +229,10 @@
     <Compile Include="Migrations\201806210501184_AddingTableModel.Designer.cs">
       <DependentUpon>201806210501184_AddingTableModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806211744300_testMigration.cs" />
+    <Compile Include="Migrations\201806211744300_testMigration.Designer.cs">
+      <DependentUpon>201806211744300_testMigration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Category.cs" />
@@ -352,6 +357,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806210501184_AddingTableModel.resx">
       <DependentUpon>201806210501184_AddingTableModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806211744300_testMigration.resx">
+      <DependentUpon>201806211744300_testMigration.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
