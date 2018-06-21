@@ -1,0 +1,33 @@
+﻿@model IEnumerable<PuntoDeVenta.Models.Table>
+
+@{
+    ViewBag.Title = "Mesas";
+}
+
+<h2>Mesas</h2>
+
+<p>
+    @Html.ActionLink("Agregar Mesa", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TableNumber)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.TableNumber)
+        </td>
+        <td>
+            @Html.ActionLink("Editar", "Edit", new { id=item.TableId }) |
+            @Html.ActionLink("Detalles", "Details", new { id=item.TableId }) |
+            @Html.ActionLink("Eliminar", "Delete", new { id=item.TableId })
+        </td>
+    </tr>
+}
+
+</table>

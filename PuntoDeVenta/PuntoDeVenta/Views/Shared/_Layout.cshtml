@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Punto de Venta</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/font-awesome.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Asadero Viva México", "Index", "Products", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Menú", "Index", "Products")</li>
+                    <li>
+                        <a href="@Url.Action("Index","Categories")">
+                            <i class="glyphicon glyphicon-list-alt"></i>
+                            <span>Categorías</span>
+                        </a>
+                        @*@Html.ActionLink("Categorías", "Index", "Categories")*@
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Tables")">
+                            <i class="fa fa-user"></i>
+                            <span>Mesas</span>
+                        </a>
+                        @*@Html.ActionLink("Mesas", "Index", "Tables")*@
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Spendings")">
+                            <i class="fa fa-dollar"></i>
+                            <span>Gastos</span>
+                        </a>
+                        @*@Html.ActionLink("Gastos", "Index", "Spendings")*@
+                    </li>
+                </ul>
+                @*@Html.Partial("_LoginPartial")*@
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Asadero Viva México</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
