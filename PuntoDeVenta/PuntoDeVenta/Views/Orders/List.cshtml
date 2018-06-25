@@ -1,0 +1,105 @@
+﻿@model IEnumerable<PuntoDeVenta.Models.Order>
+@{
+                /**/
+
+                ViewBag.Title = "Lista de ordenes";
+}
+<h2>Lista de ordenes por pagar</h2>
+<p>
+    @Html.ActionLink("Agregar nuevo", "Create")
+</p>
+
+@foreach (var dis in ViewBag.dis)
+{
+    <button class="collapsible">Mesa @dis</button>
+    <div class="content">
+
+        @foreach (var item in Model)
+        {
+
+            if (item.Table.TableNumber == dis)
+            {
+                <dl class="dl-horizontal">
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Product.ProductName)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(modelItem => item.Product.ProductName)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Table.TableNumber)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(modelItem => item.Table.TableNumber)
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Quantity)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </dd>
+                </dl>
+            }
+
+        }
+    </div>
+}
+
+<script>
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        });
+    } 
+    
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    }
+</script>
+<style>
+    /* Style the button that is used to open and close the collapsible content */
+    .collapsible {
+        background-color: rgb(204, 204, 204);
+        color: rgb(20, 20, 20);
+        cursor: pointer;
+        padding: 18px;
+        width: 80%;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        margin-bottom: 10px;
+    }
+
+        /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+        .collapsible:hover {
+            background-color: #ccc;
+        }
+    /* Style the collapsible content. Note: hidden by default */
+    .content {
+        display: none;
+        padding: 0 18px;
+        background-color: white;
+        max-height: 0;
+        overflow: hidden;
+        transition: all 0.2s ease-out;
+    }
+</style>

@@ -14,5 +14,8 @@ namespace PuntoDeVenta.Models
         [Required]
         [Display(Name = "Mesa")]
         public int TableNumber { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
+
     }
 }

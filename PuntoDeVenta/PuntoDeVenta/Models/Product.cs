@@ -27,5 +27,8 @@ namespace PuntoDeVenta.Models
         [Display(Name = "Precio")]
         [DataType(DataType.Currency)]
         public float Price { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
+
     }
 }

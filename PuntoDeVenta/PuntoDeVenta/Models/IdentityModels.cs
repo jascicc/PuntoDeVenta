@@ -34,5 +34,6 @@ namespace PuntoDeVenta.Models
         public DbSet<Category> Categories { get; set; }
         public DbSet<Spending> Spendings { get; set; }
         public DbSet<Table> Tables { get; set; }
+        public DbSet<Order> Orders { get; set; }
     }
 }
