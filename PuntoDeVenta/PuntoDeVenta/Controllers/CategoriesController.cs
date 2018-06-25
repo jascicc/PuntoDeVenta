@@ -17,7 +17,8 @@ namespace PuntoDeVenta.Controllers
         // GET: Categories
         public ActionResult Index()
         {
-            return View(db.Categories.ToList());
+            var categoriesList = db.Categories.ToList().OrderBy(c => c.CategoryName);
+            return View(categoriesList);
         }
 
         // GET: Categories/Details/5
