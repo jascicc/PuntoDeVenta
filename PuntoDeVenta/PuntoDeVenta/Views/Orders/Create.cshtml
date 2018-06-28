@@ -5,208 +5,359 @@
 }
 
 <!DOCTYPE html>
-
 <html>
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orden</title>
+
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <link href="~/Content/font-awesome.css" rel="stylesheet" />
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    <link href="~/Content/font-awesome.css" rel="stylesheet" />
 
 </head>
 <body>
     <div>
-        @* esto puede suplirse por un nav sticky con smooth scroll y seccionar platillos o modales *@
         <div id="sidebar">
             <ul class="sidebar-nav">
-                <li>
-                    @Html.ActionLink("Todos", "Create", new { id = 0 })
-                </li>
                 @foreach (PuntoDeVenta.Models.Category item in ViewBag.categories)
                 {
                     <li>
-                        @Html.ActionLink(item.CategoryName, "Create", new { id = item.CategoryId })
+                        <input class="category" value="@item.CategoryName" onclick="display('@item.CategoryId')" type="button">
                     </li>
                 }
-                <li>
+                <li style="padding-top:20px;">
                     @Html.ActionLink("Pendientes", "List")
                 </li>
             </ul>
         </div>
 
-        @*<i class="fa fa-shopping-cart"></i>*@
-
-
-
         <div class="products">
-            @foreach (var item in ViewBag.products)
+            @foreach (PuntoDeVenta.Models.Product product in ViewBag.products)
             {
-                // falta ajustar el form al tamaño de la carta
-                using (Html.BeginForm())
-                {
+                PuntoDeVenta.Models.Order order = new PuntoDeVenta.Models.Order();
+                order.Product = product;
+                //list.Add(order);
+                <form class="card" name="@product.CategoryId" id="product @product.ProductID" method="post" action="/Orders/Create">
                     @Html.AntiForgeryToken()
-                      <div class="form-horizontal">
-                            <div class="card" type="submit" value="">
-                            <center><img class="card-img-top" src="~/Content/Tacos.jpg"></center>
-                            <h2 class="title">@item.ProductName</h2>
+                    <div class="noDisplay">
+                            @* falta traerse desde antes el id de la mesa*@
+                            <input type="number" name="TableId" value="3" />
 
-                            <div class="noDisplay">
-                                <div class="form-group">
-                                    @* falta traerse desde antes el id de la mesa *@
-                                    <input type="number" name="TableId" value="3" />
-                                </div>
+                            <input type="number" name="ProductID" value="@product.ProductID" />
 
-                                <div class="form-group">
-                                    <input type="number" name="ProductID" value="@item.ProductID" />
-                                </div>
+                            <input type="text" name="Active" value="por pagar" />
 
-                                <div class="form-group">
-                                    <input type="text" name="Active" value="por pagar" />
-                                </div>
+                            <input type="number" id="@product.ProductID" name="Quantity" value="1" class="badge @product.ProductID" />
+                    </div>
+                    <div class="card-img-top">
+                        <center><img class="card-img-top" src="~/Content/Tacos.jpg"></center>
+                        <input class="mybtn add" value="+" onclick="add('@product.ProductID')" type="button">
+                        <input class="mybtn remove" value="-" onclick="removeItem('@product.ProductID')" type="button">
+                    </div>
+                    <input class="btn-submit" type="submit" value="" />
 
-                                <div class="form-group">
-                                    @* falta boton para aumentar la cantidad *@
-                                    <input type="number" name="Quantity" value="1" />
-                                </div>
-                            </div>
+                    <h2 class="title" id="title @product.ProductID">@product.ProductName</h2>
 
-                            <div class="form-group">
-                                <input type="submit" value="submit" />
-                            </div>
-                        </div>
-                     </div>
-                 }
-             }
-         </div>
-                @*<div class="icon">
-                    <i class="glyphicon glyphicon-shopping-cart" />
-                    <span class="badge">0</span>
-                    </div>*@
+                    <span class="myBadge" id="mybadge @product.ProductID">
+                        <label id="lbl @product.ProductID">1</label>
+                    </span>
+                </form>
+            }
+        </div>
+        <div class="icon">
+            <i class="fa fa-shopping-cart" data-toggle="modal" data-target="#myModal"></i>
+            <span class="myBadge bdg2"></span>
+        </div>
+
+    </div>
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Productos en la orden</h3>
+
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Product.ProductName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Quantity)
+                            </th>
+
+                        </tr>
+
+                        @*@foreach (var item in list)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Product.ProductName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Quantity)
+                                </td>
+                            </tr>
+                        }*@
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <form action="Orders/CreateOrder" method="post">
+                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                        @*<input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />*@
+                        @*@Html.ActionLink("Enviar", "CreateOrder", new { orders = list }, new { @class = "btn btn-success" })*@
+                    </form>
+                </div>
             </div>
-        </body>
-    </html>
+        </div>
+    </div>
+</body>
+</html>
 
+<script>
+    function display(category) {
+        var all = document.getElementsByClassName('card');
+        for (var i = 0; i < all.length; i++) {
+            all[i].style.display = "none";
+        }
+        var coll = document.getElementsByName(category);
+        for (var i = 0; i < coll.length; i++) {
+            coll[i].style.display = "inline-grid";
+        }
+    }
 
-    <style scoped>
-        .noDisplay{
-            display: none;
+    function add(id) {
+        var input = document.getElementById(id);
+        var val = parseInt(input.value) + 1;
+        input.value = val;
+        //hace que se mueva el card
+        if (val > 1) {
+            var badge = document.getElementById("mybadge " + id);
+            badge.style.display = "flex";
         }
-        form {
-            width: 20rem !important;
-        }
-        .form-horizontal {
-            width:20rem !important;
-        }
-        .icon {
-            font-size: 8rem;
-            position: absolute;
-            top: 0px;
-            right: 3rem;
-            -webkit-transform: scaleX(-1);
-            height: 10rem;
-            width: 10rem;
-        }
+        document.getElementById("lbl " + id).innerHTML = val;
+    }
 
-        span {
-            border-radius: 100% !important;
-            height: 25px;
-            width: 25px;
-            position: absolute;
-            top: 0px;
-            left: 15px;
-            background-color: rgb(0, 180, 255) !important;
-        }
-
-        i {
-            position: absolute;
-            top: 2rem;
-            right: 5px;
-        }
-
-        .title {
-            margin-bottom: 5%;
-            padding-left: 15px;
-            color: rgb(0, 0, 255);
-            font-weight: 400;
-            font-size: 2rem;
+    function removeItem(id) {
+        var input = document.getElementById(id);
+        var val = parseInt(input.value);
+        if (val > 1) {
+            input.value = val - 1;
+            document.getElementById("lbl " + id).innerHTML = val - 1;
+            if (val == 2) {
+                var badge = document.getElementById("mybadge " + id);
+                badge.style.display = "none";
+            }
         }
 
-        .card-img-top {
-            margin-top: 0px;
-            width: 100%;
-            height: 100%;
-            border-radius: 10px 10px 0px 0px;
+    }
+</script>
+
+<style>
+    .myBadge {
+        border-radius: 100% !important;
+        background-color: rgb(0, 180, 255) !important;
+        width: 5rem;
+        height: 5rem;
+        position: absolute;
+        top: -1.5rem;
+        right: -1.5rem;
+        z-index: 99;
+        display: none;
+        flex-direction: row;
+        align-content: center;
+        align-items: center;
+    }
+
+    .bdg2 {
+        background-color: rgb(0, 255, 0) !important;
+        width: 3rem !important;
+        height: 3rem !important;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 99;
+        display: flex;
+        flex-direction: row;
+        align-content: center;
+        align-items: center;
+    }
+
+    label {
+        width: 100%;
+        text-align: center;
+        align-self: center;
+        font-size: 1.8rem;
+        color: rgb(52, 52, 52);
+    }
+
+    .btn-submit {
+        width: 100% !important;
+        height: 28rem;
+        position: absolute;
+        background: transparent;
+        border: none;
+        border-radius: 10px;
+        z-index: 90;
+    }
+
+    .mybtn {
+        z-index: 98;
+        position: absolute;
+        width: 5rem !important;
+        color: white;
+        font-weight: bold;
+        border: none;
+    }
+
+    .add {
+        background-color: rgba(0, 255, 0, 0.7);
+        top: 0;
+        right: 0;
+        height: 75%;
+        border-radius: 0px 10px 0px 0px;
+    }
+
+    .remove {
+        background-color: rgba(157, 19, 19, 0.7);
+        right: 0;
+        bottom: 0;
+        height: 25%;
+    }
+
+    .noDisplay {
+        display: none;
+        width: 0px;
+        height: 0px;
+    }
+
+    .icon {
+        font-size: 10rem;
+        position: absolute;
+        top: 0px;
+        right: 3rem;
+        height: 10rem;
+        width: 10rem;
+        border-radius: 50%;
+    }
+
+    i {
+        position: absolute;
+        top: 2rem;
+        right: 5px;
+        color: rgb(128, 128, 128);
+        cursor: pointer;
+    }
+
+    .title {
+        margin-bottom: 5%;
+        padding-left: 15px;
+        color: rgb(0, 0, 255);
+        font-weight: 400;
+        font-size: 2rem;
+    }
+
+    .card-img-top {
+        position: relative;
+        margin-top: 0px;
+        width: 28rem;
+        height: 22rem;
+        border-radius: 10px 10px 0px 0px;
+    }
+
+    .products {
+        position: absolute;
+        left: 18rem;
+        width: 85%;
+    }
+
+    .card {
+        cursor: pointer;
+        position: relative;
+        width: 28rem;
+        height: 28rem;
+        display: inline-grid;
+        margin: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    }
+
+        .card:hover {
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.4);
         }
 
-        .products {
-            position: absolute;
-            left: 15%;
-            width: 85%;
+        .card:active {
+            box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.4);
         }
 
-        .card {
-            width: 28rem;
-            height: 25rem;
-            display: inline-grid;
-            margin: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.4);
+
+    body {
+        padding: 0px !important;
+        margin: 0px !important;
+    }
+
+    #sidebar {
+        z-index: 100;
+        position: fixed;
+        width: 18rem;
+        height: 100%;
+        margin-top: 0px;
+        background: rgb(31, 31, 31);
+    }
+
+    .sidebar-nav {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .category {
+        background: transparent;
+        width: 100%;
+        border: none;
+        text-align: left;
+        text-decoration: none;
+        color: #999999;
+        font-size: 2.5rem;
+    }
+
+        .category:hover {
+            text-decoration: none;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.2);
         }
 
-            .card:hover {
-                box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.9);
+    .sidebar-nav li {
+        text-indent: 5px;
+        line-height: 40px;
+    }
+
+        .sidebar-nav li a {
+            display: block;
+            text-decoration: none;
+            color: #999999;
+            font-size: 2.5rem;
+        }
+
+            .sidebar-nav li a:hover {
+                text-decoration: none;
+                color: #fff;
+                background: rgba(255, 255, 255, 0.2);
             }
 
-            .card:active {
-                box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.3);
-            }
-
-
-        body {
-            padding: 0px !important;
-            margin: 0px !important;
-        }
-
-        #sidebar {
-            z-index: 1000;
-            position: fixed;
-            width: 15%;
-            height: 100%;
-            margin-top: 0px;
-            background: rgb(31, 31, 31);
-        }
-
-        .sidebar-nav {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-            .sidebar-nav li {
-                text-indent: 5px;
-                line-height: 40px;
-            }
-
-                .sidebar-nav li a {
-                    display: block;
-                    text-decoration: none;
-                    color: #999999;
-                    font-size: 150%;
-                }
-
-                    .sidebar-nav li a:hover {
-                        text-decoration: none;
-                        color: #fff;
-                        background: rgba(255, 255, 255, 0.2);
-                    }
-
-                    .sidebar-nav li a:active, .sidebar-nav li a:focus {
-                        text-decoration: none;
-                    }
-
-        @@media screen and (max-width: 954px) {
-        }
-    </style>
+    @@media screen and (max-width: 954px) {
+    }
+</style>

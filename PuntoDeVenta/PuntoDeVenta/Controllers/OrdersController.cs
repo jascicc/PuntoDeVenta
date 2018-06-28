@@ -53,18 +53,10 @@ namespace PuntoDeVenta.Controllers
         }
 
         // GET: Orders/Create
-        public ActionResult Create(int? id)
+        public ActionResult Create()
         {
-            if (id == null || id == 0)
-            {
-                ViewBag.products = db.Products.ToList();
-            }
-            else
-            {
-                ViewBag.products = db.Products.Where(x => x.CategoryId == id).ToList();
-            }
             ViewBag.categories = db.Categories.ToList();
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber");
+            ViewBag.products = db.Products.ToList();
 
             return View();
         }
@@ -77,13 +69,13 @@ namespace PuntoDeVenta.Controllers
             if (ModelState.IsValid)
             {
                 order.Date = DateTime.Now;
-                db.Orders.Add(order);
-                db.SaveChanges();
+                //db.Orders.Add(order);
+                //db.SaveChanges();
                 //return RedirectToAction("List");
             }
 
-            ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber", order.TableId);
+            ViewBag.categories = db.Categories.ToList();
+            ViewBag.products = db.Products.ToList();
             return View(order);
         }
 
