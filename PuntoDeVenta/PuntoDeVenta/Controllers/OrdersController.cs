@@ -23,13 +23,13 @@ namespace PuntoDeVenta.Controllers
 
         public ActionResult List()
         {
-            var orders = db.Orders.Where(x => x.Active == "por pagar").Include(o => o.Product).Include(o => o.Table);
-            var dis = new List<int>();
+            var orders = db.Orders.Where(x => x.Active == "POR PAGAR").Include(o => o.Product).Include(o => o.Table);
+            var dis = new List<string>();
             foreach (var item in orders)
             {
-                if (!dis.Contains(item.Table.TableNumber))
+                if (!dis.Contains(item.GroupID))
                 {
-                    dis.Add(item.Table.TableNumber);
+                    dis.Add(item.GroupID);
                 }
             }
             ViewBag.dis = dis;
@@ -51,12 +51,44 @@ namespace PuntoDeVenta.Controllers
             }
             return View(order);
         }
+        
+        [HttpPost]
+        public ActionResult OrdersPost(List<Order> orders)
+        {
+            var date = DateTime.Now;
+            var active = "POR PAGAR";
+            foreach (var item in orders)
+            {
+                item.Active = active;
+                item.Date = date;
+                item.GroupID = date.ToString().Replace("/", null).Replace(" ", null).Replace(":", null).Replace(".", null) + item.TableId.ToString();
+                db.Orders.Add(item);
+            }
+            db.SaveChanges();
+            // no esta redirigiendo
+            return RedirectToAction("List");
+        }
+
+        //Orders/Pay/:id
+        public ActionResult Pay(string id)
+        {
+            var orders = db.Orders.Where(o => o.GroupID == id);
+            foreach (var order in orders)
+            {
+                order.Active = "PAGADO";
+                db.Entry(order).State = EntityState.Modified;
+            }
+            db.SaveChanges();
+
+            return RedirectToAction("List");
+        }
 
         // GET: Orders/Create
         public ActionResult Create()
         {
-            ViewBag.categories = db.Categories.ToList();
+            ViewBag.categories = db.Categories.ToList().OrderBy(c => c.CategoryName);
             ViewBag.products = db.Products.ToList();
+            ViewBag.tables = db.Tables.ToList().OrderBy(a => a.TableNumber);
 
             return View();
         }
@@ -79,34 +111,34 @@ namespace PuntoDeVenta.Controllers
             return View(order);
         }
 
-        //GET: Orders/Create1
-        public ActionResult Create1()
-        {
-            ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber");
-            return View();
-        }
+        ////GET: Orders/Create1
+        //public ActionResult Create1()
+        //{
+        //    ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
+        //    ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber");
+        //    return View();
+        //}
 
-        // POST: Orders/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create1([Bind(Include = "OrderId,TableId,ProductId,Quantity,Date,Active")] Order order)
-        {
-            order.Active = "por pagar";
-            if (ModelState.IsValid)
-            {
-                order.Date = DateTime.Now;
-                db.Orders.Add(order);
-                db.SaveChanges();
-                return RedirectToAction("List");
-            }
+        //// POST: Orders/Create
+        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        //// more details see https://go.microsoft.com/fwlink/?LinkId=317598.
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Create1([Bind(Include = "OrderId,TableId,ProductId,Quantity,Date,Active")] Order order)
+        //{
+        //    order.Active = "por pagar";
+        //    if (ModelState.IsValid)
+        //    {
+        //        order.Date = DateTime.Now;
+        //        db.Orders.Add(order);
+        //        db.SaveChanges();
+        //        return RedirectToAction("List");
+        //    }
 
-            ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber", order.TableId);
-            return View(order);
-        }
+        //    ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
+        //    ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber", order.TableId);
+        //    return View(order);
+        //}
 
         // GET: Orders/Edit/5
         public ActionResult Edit(int? id)

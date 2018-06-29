@@ -10,11 +10,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orden</title>
-
     <script src="~/Scripts/jquery-1.10.2.min.js"></script>
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
     <script src="~/Scripts/bootstrap.min.js"></script>
     <link href="~/Content/font-awesome.css" rel="stylesheet" />
+    <script src="~/Scripts/myScript.js"></script>
+    <script src="~/Scripts/alertify.js"></script>
+    <link href="~/Content/alertify.css" rel="stylesheet" />
+    <link href="~/Content/default.min.css" rel="stylesheet" />
 
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
@@ -43,36 +46,28 @@
                 PuntoDeVenta.Models.Order order = new PuntoDeVenta.Models.Order();
                 order.Product = product;
                 //list.Add(order);
-                <form class="card" name="@product.CategoryId" id="product @product.ProductID" method="post" action="/Orders/Create">
+                <div class="card" name="@product.CategoryId" id="product @product.ProductID" @*method="post" action="/Orders/Create"*@>
                     @Html.AntiForgeryToken()
-                    <div class="noDisplay">
-                            @* falta traerse desde antes el id de la mesa*@
-                            <input type="number" name="TableId" value="3" />
-
-                            <input type="number" name="ProductID" value="@product.ProductID" />
-
-                            <input type="text" name="Active" value="por pagar" />
-
-                            <input type="number" id="@product.ProductID" name="Quantity" value="1" class="badge @product.ProductID" />
-                    </div>
                     <div class="card-img-top">
                         <center><img class="card-img-top" src="~/Content/Tacos.jpg"></center>
-                        <input class="mybtn add" value="+" onclick="add('@product.ProductID')" type="button">
-                        <input class="mybtn remove" value="-" onclick="removeItem('@product.ProductID')" type="button">
+                        @*<input class="mybtn add" value="+" onclick="add('@product.ProductID')" type="button">*@
+                        @*<input class="mybtn remove" value="-" onclick="removeItem('@product.ProductID')" type="button">*@
                     </div>
-                    <input class="btn-submit" type="submit" value="" />
+                    <input class="btn-submit" type="submit" value="" onclick="addToCart('@product.ProductID')" />
 
-                    <h2 class="title" id="title @product.ProductID">@product.ProductName</h2>
+                    <h2 class="title" id="name @product.ProductID">@product.ProductName</h2>
 
                     <span class="myBadge" id="mybadge @product.ProductID">
                         <label id="lbl @product.ProductID">1</label>
                     </span>
-                </form>
+                </div>
             }
         </div>
-        <div class="icon">
+        <div class="cart sticky">
             <i class="fa fa-shopping-cart" data-toggle="modal" data-target="#myModal"></i>
-            <span class="myBadge bdg2"></span>
+            <span class="myBadge bdg2">
+                <label id="bdgQuantity">0</label>
+            </span>
         </div>
 
     </div>
@@ -83,10 +78,9 @@
                 <div class="modal-header">
                     <a href="#" class="close" data-dismiss="modal">&times;</a>
                     <h3 class="modal-title">Productos en la orden</h3>
-
                 </div>
                 <div class="modal-body">
-                    <table class="table">
+                    <table class="table table-striped" id="myTable">
                         <tr>
                             <th>
                                 @Html.DisplayNameFor(model => model.Product.ProductName)
@@ -94,29 +88,21 @@
                             <th>
                                 @Html.DisplayNameFor(model => model.Quantity)
                             </th>
-
+                            <th></th>
                         </tr>
-
-                        @*@foreach (var item in list)
-                        {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Product.ProductName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Quantity)
-                                </td>
-                            </tr>
-                        }*@
                     </table>
+
+                    <div class="tables">
+                        @foreach (PuntoDeVenta.Models.Table item in ViewBag.tables)
+                        {
+                            <input class="taable" type="button" value="Mesa @item.TableNumber" onclick="selectTable(@item.TableId,@item.TableNumber)" />
+                        }
+                    </div>
 
                 </div>
                 <div class="modal-footer">
-                    <form action="Orders/CreateOrder" method="post">
-                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                        @*<input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />*@
-                        @*@Html.ActionLink("Enviar", "CreateOrder", new { orders = list }, new { @class = "btn btn-success" })*@
-                    </form>
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />
                 </div>
             </div>
         </div>
@@ -124,46 +110,21 @@
 </body>
 </html>
 
-<script>
-    function display(category) {
-        var all = document.getElementsByClassName('card');
-        for (var i = 0; i < all.length; i++) {
-            all[i].style.display = "none";
-        }
-        var coll = document.getElementsByName(category);
-        for (var i = 0; i < coll.length; i++) {
-            coll[i].style.display = "inline-grid";
-        }
-    }
-
-    function add(id) {
-        var input = document.getElementById(id);
-        var val = parseInt(input.value) + 1;
-        input.value = val;
-        //hace que se mueva el card
-        if (val > 1) {
-            var badge = document.getElementById("mybadge " + id);
-            badge.style.display = "flex";
-        }
-        document.getElementById("lbl " + id).innerHTML = val;
-    }
-
-    function removeItem(id) {
-        var input = document.getElementById(id);
-        var val = parseInt(input.value);
-        if (val > 1) {
-            input.value = val - 1;
-            document.getElementById("lbl " + id).innerHTML = val - 1;
-            if (val == 2) {
-                var badge = document.getElementById("mybadge " + id);
-                badge.style.display = "none";
-            }
-        }
-
-    }
-</script>
-
 <style>
+    .dngr {
+        color: red !important;
+    }
+
+    .taable {
+        margin: .7rem;
+        width: 9rem;
+        height: 4rem;
+    }
+
+    .tables {
+        margin-top: 10rem;
+    }
+
     .myBadge {
         border-radius: 100% !important;
         background-color: rgb(0, 180, 255) !important;
@@ -209,6 +170,7 @@
         border: none;
         border-radius: 10px;
         z-index: 90;
+        cursor: pointer;
     }
 
     .mybtn {
@@ -235,20 +197,19 @@
         height: 25%;
     }
 
-    .noDisplay {
-        display: none;
-        width: 0px;
-        height: 0px;
-    }
-
-    .icon {
+    /*div.sticky {
+        position: -webkit-sticky; 
+        position: sticky;
+        top: 0;
+    }*/ 
+    .cart {
         font-size: 10rem;
-        position: absolute;
-        top: 0px;
-        right: 3rem;
+        top: 0;
+        right: 0;
         height: 10rem;
         width: 10rem;
         border-radius: 50%;
+        position: absolute;
     }
 
     i {

@@ -1,23 +1,19 @@
 ﻿@model IEnumerable<PuntoDeVenta.Models.Order>
 @{
-                /**/
-
-                ViewBag.Title = "Lista de ordenes";
+    ViewBag.Title = "Lista de ordenes";
 }
+<script src="~/Scripts/myScript.js"></script>
 <h2>Lista de ordenes por pagar</h2>
 <p>
-    @Html.ActionLink("Agregar nuevo", "Create")
+    @*@Html.ActionLink("Agregar nuevo", "Create")*@
 </p>
-
 @foreach (var dis in ViewBag.dis)
 {
-    <button class="collapsible">Mesa @dis</button>
+    <button class="collapsible">Mesa @Model.Where(a => a.GroupID == dis).First().Table.TableNumber</button>
     <div class="content">
-
         @foreach (var item in Model)
         {
-
-            if (item.Table.TableNumber == dis)
+            if (item.GroupID == dis)
             {
                 <dl class="dl-horizontal">
 
@@ -27,13 +23,6 @@
                     <dd>
                         @Html.DisplayFor(modelItem => item.Product.ProductName)
                     </dd>
-
-                    <dt>
-                        @Html.DisplayNameFor(model => model.Table.TableNumber)
-                    </dt>
-                    <dd>
-                        @Html.DisplayFor(modelItem => item.Table.TableNumber)
-                    </dd>
                     <dt>
                         @Html.DisplayNameFor(model => model.Quantity)
                     </dt>
@@ -41,9 +30,13 @@
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </dd>
                 </dl>
+
             }
 
         }
+        @*<input class="right" type="submit" value="Pagar" onclick="@Url.Action("Pay", new { id = @Model.Where(a => a.GroupID == dis).First().GroupID })"/>*@
+        @Html.ActionLink("Pagar", "Pay", new { id = @Model.Where(a => a.GroupID == dis).First().GroupID })
+        @*<input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />*@
     </div>
 }
 
@@ -61,8 +54,8 @@
                 content.style.display = "block";
             }
         });
-    } 
-    
+    }
+
     for (i = 0; i < coll.length; i++) {
         coll[i].addEventListener("click", function () {
             this.classList.toggle("active");

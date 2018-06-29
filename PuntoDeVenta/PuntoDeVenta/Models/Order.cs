@@ -17,6 +17,9 @@ namespace PuntoDeVenta.Models
         public DateTime Date { get; set; }
         
         [Required]
+        public string GroupID { get; set; }
+
+        [Required]
         [Display(Name ="Mesa")]
         public int TableId { get; set; }
 
