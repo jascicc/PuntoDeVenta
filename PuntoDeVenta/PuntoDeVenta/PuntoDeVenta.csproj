@@ -245,6 +245,10 @@
     <Compile Include="Migrations\201807040039571_AddingImagePropToProductModel.Designer.cs">
       <DependentUpon>201807040039571_AddingImagePropToProductModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807050254530_solvingissue.cs" />
+    <Compile Include="Migrations\201807050254530_solvingissue.Designer.cs">
+      <DependentUpon>201807050254530_solvingissue.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Category.cs" />
@@ -403,6 +407,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807040039571_AddingImagePropToProductModel.resx">
       <DependentUpon>201807040039571_AddingImagePropToProductModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807050254530_solvingissue.resx">
+      <DependentUpon>201807050254530_solvingissue.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
