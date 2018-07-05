@@ -35,5 +35,6 @@ namespace PuntoDeVenta.Models
         public DbSet<Spending> Spendings { get; set; }
         public DbSet<Table> Tables { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<StaticConfig> StaticConfig { get; set; }
     }
 }
