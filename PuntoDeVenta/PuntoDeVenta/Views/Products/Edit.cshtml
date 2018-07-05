@@ -1,18 +1,18 @@
 ﻿@model PuntoDeVenta.Models.Product
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Editar";
 }
 
-<h2>Edit</h2>
+<h2>Editar</h2>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 
-
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>Product</h4>
+        <h4>Producto</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.ProductID)
@@ -21,7 +21,7 @@
             @Html.LabelFor(model => model.ProductName, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.ProductName, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ProductName, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.ProductName, "Ingrese un nombre válido", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -29,7 +29,7 @@
             @Html.LabelFor(model => model.CategoryId, "CategoryId", htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.DropDownList("CategoryId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.CategoryId, "Seleccione una categoria válida", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -37,13 +37,36 @@
             @Html.LabelFor(model => model.Price, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                @Html.ValidationMessageFor(model => model.Price, "Ingrese un precio válido", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @{
+                    if (Model.Image != null)
+                    {
+                        var base64 = Convert.ToBase64String(Model.Image);
+                        var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                        byte[] bytes = Convert.FromBase64String(base64);
+
+                        <img id="myImg" src="@imgSrc" onclick="myfunction()" />
+
+                        <input type="file" name="img" id="img" value="@bytes" accept="image/*" />
+                    }
+                    else
+                    {
+                        <img id="myImg" onclick="myfunction()" alt="Haga click para seleccionar una imagen" />
+                        <input type="file" name="img" id="img" accept="image/*" />
+                    }
+                }
             </div>
         </div>
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input id="submit" type="submit" value="Guardar" class="btn btn-default" disabled />
             </div>
         </div>
     </div>
@@ -56,3 +79,42 @@
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+<script>
+    function myfunction() {
+        document.getElementById("img").click();
+    }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var allowtypes = ["jpg", "png", "jpeg"];
+            if ($.inArray($(input).val().split('.').pop().toLowerCase(), allowtypes) == -1) {
+                $("#submit").prop("disabled", true);
+            } else {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#myImg').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+                $("#submit").prop("disabled", false);
+            }
+        }
+    }
+
+    $("#img").change(function () {
+        readURL(this);
+    });
+
+</script>
+<style>
+    #myImg {
+        width: 250px;
+        height: 150px;
+        cursor: pointer;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+</style>

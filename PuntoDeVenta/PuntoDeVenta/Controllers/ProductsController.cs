@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -29,6 +30,8 @@ namespace PuntoDeVenta.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             Product product = db.Products.Find(id);
+            Category category = db.Categories.Find(product.CategoryId);
+            product.category = category;
             if (product == null)
             {
                 return HttpNotFound();
@@ -48,14 +51,20 @@ namespace PuntoDeVenta.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ProductID,ProductName,CategoryId,Price")] Product product)
+        public ActionResult Create([Bind(Include = "ProductID,ProductName,CategoryId,Price")] Product product, HttpPostedFileBase img)
         {
-            if (ModelState.IsValid)
+            if (img != null)
             {
-                db.Products.Add(product);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                product.Image = new byte[img.ContentLength];
+                img.InputStream.Read(product.Image, 0, img.ContentLength);
+                if (ModelState.IsValid)
+                {
+                    db.Products.Add(product);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
+
 
             ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
@@ -82,14 +91,20 @@ namespace PuntoDeVenta.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductID,ProductName,CategoryId,Price")] Product product)
+        public ActionResult Edit([Bind(Include = "ProductID,ProductName,CategoryId,Price")] Product product, HttpPostedFileBase img)
         {
-            if (ModelState.IsValid)
+            if (img != null)
             {
-                db.Entry(product).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                product.Image = new byte[img.ContentLength];
+                img.InputStream.Read(product.Image, 0, img.ContentLength);
+                if (ModelState.IsValid)
+                {
+                    db.Entry(product).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
+
             ViewBag.CategoryId = new SelectList(db.Categories, "CategoryId", "CategoryName", product.CategoryId);
             return View(product);
         }

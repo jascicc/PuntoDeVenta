@@ -51,7 +51,7 @@ namespace PuntoDeVenta.Controllers
             }
             return View(order);
         }
-        
+
         [HttpPost]
         public ActionResult OrdersPost(List<Order> orders)
         {
@@ -61,12 +61,19 @@ namespace PuntoDeVenta.Controllers
             {
                 item.Active = active;
                 item.Date = date;
-                item.GroupID = date.ToString().Replace("/", null).Replace(" ", null).Replace(":", null).Replace(".", null) + item.TableId.ToString();
+                item.GroupID = (date.ToString() + item.TableId.ToString()).Replace("/", null).Replace(" ", null).Replace(":", null).Replace(".", null);
                 db.Orders.Add(item);
             }
-            db.SaveChanges();
-            // no esta redirigiendo
-            return RedirectToAction("List");
+            try
+            {
+                db.SaveChanges();
+                return Json(new { ok = true, newurl = Url.Action("List") });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, message = ex });
+
+            }
         }
 
         //Orders/Pay/:id
@@ -89,6 +96,15 @@ namespace PuntoDeVenta.Controllers
             ViewBag.categories = db.Categories.ToList().OrderBy(c => c.CategoryName);
             ViewBag.products = db.Products.ToList();
             ViewBag.tables = db.Tables.ToList().OrderBy(a => a.TableNumber);
+            var busy = new List<int>();
+            foreach (var item in db.Orders.Where(x => x.Active == "POR PAGAR").Include(o => o.Product).Include(o => o.Table))
+            {
+                if (!busy.Contains(item.Table.TableNumber))
+                {
+                    busy.Add(item.Table.TableNumber);
+                }
+            }
+            ViewBag.busy = busy;
 
             return View();
         }

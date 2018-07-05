@@ -9,7 +9,7 @@
 <p>
     @Html.ActionLink("Agregar Categoría", "Create")
 </p>
-<table class="table">
+<table class="table table-striped">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.CategoryName)
@@ -17,17 +17,18 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.CategoryName)
-        </td>
-        <td>
-            @Html.ActionLink("Editar", "Edit", new { id=item.CategoryId }) |
-            @Html.ActionLink("Detalles", "Details", new { id=item.CategoryId }) |
-            @Html.ActionLink("Eliminar", "Delete", new { id=item.CategoryId })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CategoryName)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new { id = item.CategoryId }) |
+                @Html.ActionLink("Detalles", "Details", new { id = item.CategoryId }) |
+                @Html.ActionLink("Eliminar", "Delete", new { id = item.CategoryId })
+            </td>
+        </tr>
+    }
 
 </table>

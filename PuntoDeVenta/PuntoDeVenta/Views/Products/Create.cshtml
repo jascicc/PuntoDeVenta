@@ -4,15 +4,15 @@
     ViewBag.Title = "Agregar";
 }
 
-<h2>Agregar Producto</h2>
+<h2>Agregar</h2>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
 
-
-@using (Html.BeginForm()) 
+@using (Html.BeginForm("Create", "Products", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>Nuevo Producto</h4>
+        <h4>Producto</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -40,17 +40,63 @@
         </div>
 
         <div class="form-group">
+            @Html.LabelFor(model => model.Image, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <img id="myImg" onclick="myfunction()" alt="Haga click para seleccionar una imagen" />
+                <input type="file" name="img" id="img" accept="image/*" />
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Agregar" class="btn btn-success" />
+                <input id="submit" type="submit" value="Create" class="btn btn-default" disabled/>
             </div>
         </div>
     </div>
 }
 
 <div>
-    @Html.ActionLink("Regresar a Menú", "Index")
+    @Html.ActionLink("Back to List", "Index")
 </div>
 
+<script>
+    function myfunction() {
+        document.getElementById("img").click();
+    }
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var allowtypes = ["jpg", "png", "jpeg"];
+            if ($.inArray($(input).val().split('.').pop().toLowerCase(), allowtypes) == -1) {
+                $("#submit").prop("disabled", true);
+            } else {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#myImg').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(input.files[0]);
+                $("#submit").prop("disabled", false);
+            }
+        }
+    }
+
+    $("#img").change(function () {
+        readURL(this);
+    });
+
+</script>
+<style>
+    #myImg {
+        width: 250px;
+        height: 150px;
+        cursor: pointer;
+    }
+
+    input[type="file"] {
+        display: none;
+    }
+</style>
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

@@ -25,7 +25,7 @@
 
 </head>
 <body>
-    <div>
+    <div style="min-width: 980px;">
         <div id="sidebar">
             <ul class="sidebar-nav">
                 @foreach (PuntoDeVenta.Models.Category item in ViewBag.categories)
@@ -34,7 +34,7 @@
                         <input class="category" value="@item.CategoryName" onclick="display('@item.CategoryId')" type="button">
                     </li>
                 }
-                <li style="padding-top:20px;">
+                <li style="margin-top:20px;">
                     @Html.ActionLink("Pendientes", "List")
                 </li>
             </ul>
@@ -43,15 +43,19 @@
         <div class="products">
             @foreach (PuntoDeVenta.Models.Product product in ViewBag.products)
             {
-                PuntoDeVenta.Models.Order order = new PuntoDeVenta.Models.Order();
-                order.Product = product;
-                //list.Add(order);
-                <div class="card" name="@product.CategoryId" id="product @product.ProductID" @*method="post" action="/Orders/Create"*@>
+                <div class="card" name="@product.CategoryId" id="product @product.ProductID">
                     @Html.AntiForgeryToken()
                     <div class="card-img-top">
-                        <center><img class="card-img-top" src="~/Content/Tacos.jpg"></center>
-                        @*<input class="mybtn add" value="+" onclick="add('@product.ProductID')" type="button">*@
-                        @*<input class="mybtn remove" value="-" onclick="removeItem('@product.ProductID')" type="button">*@
+                        @if (product.Image != null)
+                        {
+                            var base64 = Convert.ToBase64String(product.Image);
+                            var imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+                            <center><img class="card-img-top" src="@imgSrc"></center>
+                        }
+                        else
+                        {
+                            <center><img class="card-img-top" alt="Product image"></center>
+                        }
                     </div>
                     <input class="btn-submit" type="submit" value="" onclick="addToCart('@product.ProductID')" />
 
@@ -62,14 +66,14 @@
                     </span>
                 </div>
             }
+
         </div>
-        <div class="cart sticky">
+        <div id="cart" class="cart">
             <i class="fa fa-shopping-cart" data-toggle="modal" data-target="#myModal"></i>
             <span class="myBadge bdg2">
                 <label id="bdgQuantity">0</label>
             </span>
         </div>
-
     </div>
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
@@ -89,13 +93,21 @@
                                 @Html.DisplayNameFor(model => model.Quantity)
                             </th>
                             <th></th>
+                            <th></th>
                         </tr>
                     </table>
 
                     <div class="tables">
                         @foreach (PuntoDeVenta.Models.Table item in ViewBag.tables)
                         {
-                            <input class="taable" type="button" value="Mesa @item.TableNumber" onclick="selectTable(@item.TableId,@item.TableNumber)" />
+                            if (ViewBag.busy.Contains(item.TableNumber))
+                            {
+                                <input class="taable busy" type="button" value="Mesa @item.TableNumber" onclick="selectTable(@item.TableId,@item.TableNumber)" />
+                            }
+                            else
+                            {
+                                <input class="taable" type="button" value="Mesa @item.TableNumber" onclick="selectTable(@item.TableId,@item.TableNumber)" />
+                            }
                         }
                     </div>
 
@@ -116,9 +128,20 @@
     }
 
     .taable {
-        margin: .7rem;
+        margin: .7rem !important;
         width: 9rem;
         height: 4rem;
+        border: none;
+        border-radius: 10px;
+    }
+
+        .taable:active {
+            filter: invert(10%);
+        }
+
+    .busy {
+        background-color: red;
+        color: white;
     }
 
     .tables {
@@ -182,42 +205,42 @@
         border: none;
     }
 
-    .add {
-        background-color: rgba(0, 255, 0, 0.7);
-        top: 0;
-        right: 0;
-        height: 75%;
-        border-radius: 0px 10px 0px 0px;
+    .addItem {
+        margin-left: 30px;
+        color: green;
     }
 
-    .remove {
-        background-color: rgba(157, 19, 19, 0.7);
-        right: 0;
-        bottom: 0;
-        height: 25%;
+    .addItem, .rmvItem {
+        font-size: 15px;
+        font-weight: 800;
+        cursor: pointer;
+        user-select: none;
     }
 
-    /*div.sticky {
-        position: -webkit-sticky; 
-        position: sticky;
-        top: 0;
-    }*/ 
+    .rmvItem {
+        color: rgba(157, 19, 19, 0.7);
+    }
+
+        .rmvItem:hover, .addItem:hover {
+            text-decoration: none;
+            filter: invert(10%);
+        }
+
     .cart {
         font-size: 10rem;
-        top: 0;
-        right: 0;
-        height: 10rem;
-        width: 10rem;
-        border-radius: 50%;
+        right: 30px;
+        width: 120px;
         position: absolute;
     }
+
 
     i {
         position: absolute;
+        width: 100%;
         top: 2rem;
-        right: 5px;
         color: rgb(128, 128, 128);
         cursor: pointer;
+        text-align: center;
     }
 
     .title {
@@ -232,14 +255,16 @@
         position: relative;
         margin-top: 0px;
         width: 28rem;
-        height: 22rem;
+        height: 21.5rem;
         border-radius: 10px 10px 0px 0px;
     }
 
     .products {
         position: absolute;
-        left: 18rem;
-        width: 85%;
+        margin-left: 20rem;
+        width: calc(100% - 20rem);
+        height: 100%;
+        overflow-y: auto;
     }
 
     .card {
@@ -253,24 +278,40 @@
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
     }
 
-        .card:hover {
-            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.4);
-        }
+    input[type=submit]:active {
+        border: none;
+        outline: none;
+    }
 
-        .card:active {
-            box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.4);
-        }
+    input[type=submit]:focus {
+        border: none;
+        outline: none;
+    }
+
+    input[type=button] {
+        padding: 0;
+        margin: 0;
+    }
+
+    .card:hover {
+        box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .card:active {
+        box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.4);
+    }
 
 
     body {
         padding: 0px !important;
         margin: 0px !important;
+        user-select: none !important;
     }
 
     #sidebar {
         z-index: 100;
         position: fixed;
-        width: 18rem;
+        width: 20rem;
         height: 100%;
         margin-top: 0px;
         background: rgb(31, 31, 31);
@@ -285,40 +326,34 @@
         list-style: none;
     }
 
-    .category {
-        background: transparent;
-        width: 100%;
-        border: none;
-        text-align: left;
-        text-decoration: none;
-        color: #999999;
-        font-size: 2.5rem;
-    }
-
-        .category:hover {
-            text-decoration: none;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.2);
+        .sidebar-nav li {
+            line-height: 40px;
         }
 
-    .sidebar-nav li {
-        text-indent: 5px;
-        line-height: 40px;
-    }
-
-        .sidebar-nav li a {
-            display: block;
-            text-decoration: none;
-            color: #999999;
-            font-size: 2.5rem;
-        }
-
-            .sidebar-nav li a:hover {
+            .sidebar-nav li a, .sidebar-nav li input[type=button] {
+                display: block;
                 text-decoration: none;
-                color: #fff;
-                background: rgba(255, 255, 255, 0.2);
+                color: #999999;
+                font-size: 2.5rem;
+                text-indent: 5px;
+                text-align: left;
+                border: none;
+                background: transparent;
+                width: 100%;
             }
 
-    @@media screen and (max-width: 954px) {
+                .sidebar-nav li a:hover, .sidebar-nav li input[type=button]:hover {
+                    text-decoration: none;
+                    color: #fff;
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
     }
 </style>
