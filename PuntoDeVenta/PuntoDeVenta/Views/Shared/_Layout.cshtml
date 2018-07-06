@@ -21,8 +21,20 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Menú", "Index", "Products")</li>
-                    <li>@Html.ActionLink("Orden", "Create", "Orders")</li>
+                    <li>
+                        @*@Html.ActionLink("Menú", "Index", "Products")*@
+                        <a href="@Url.Action("Index","Products")">
+                            <i class="fa fa-book"></i>
+                            <span>Menú </span>
+                        </a>
+                    </li>
+                    <li>
+                        @*@Html.ActionLink("Orden", "Create", "Orders")*@
+                        <a href="@Url.Action("Create","Orders")">
+                            <i class="fa fa-cutlery"></i>
+                            <span>Órdenes </span>
+                        </a>
+                    </li>
                     <li>
                         <a href="@Url.Action("Index","Categories")">
                             <i class="glyphicon glyphicon-list-alt"></i>
@@ -32,7 +44,7 @@
                     </li>
                     <li>
                         <a href="@Url.Action("Index","Tables")">
-                            <i class="fa fa-user"></i>
+                            <i class="fa fa-microchip"></i>
                             <span>Mesas</span>
                         </a>
                         @*@Html.ActionLink("Mesas", "Index", "Tables")*@

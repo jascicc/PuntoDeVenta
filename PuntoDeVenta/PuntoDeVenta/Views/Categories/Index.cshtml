@@ -4,7 +4,7 @@
     ViewBag.Title = "Categorías";
 }
 
-<h2>Index</h2>
+<h2>Categorías</h2>
 
 <p>
     @Html.ActionLink("Agregar Categoría", "Create")
@@ -24,9 +24,17 @@
                 @Html.DisplayFor(modelItem => item.CategoryName)
             </td>
             <td>
-                @Html.ActionLink("Editar", "Edit", new { id = item.CategoryId }) |
-                @Html.ActionLink("Detalles", "Details", new { id = item.CategoryId }) |
-                @Html.ActionLink("Eliminar", "Delete", new { id = item.CategoryId })
+                <a href="@Url.Action("Edit", new { id = item.CategoryId })">
+                    <i class="fa fa-pencil"></i>
+                    <span>Editar </span>
+                </a>
+                |
+                @*@Html.ActionLink("Editar", "Edit", new { id = item.CategoryId }) |*@
+                @*@Html.ActionLink("Eliminar", "Delete", new { id = item.CategoryId })*@
+                <a href="@Url.Action("Delete", new { id = item.CategoryId })">
+                    <i class="fa fa-times"></i>
+                    <span>Eliminar </span>
+                </a>
             </td>
         </tr>
     }
