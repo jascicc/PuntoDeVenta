@@ -22,23 +22,6 @@ namespace PuntoDeVenta.Controllers
             return View(products.ToList());
         }
 
-        // GET: Products/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            Category category = db.Categories.Find(product.CategoryId);
-            product.category = category;
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
-
         // GET: Products/Create
         public ActionResult Create()
         {

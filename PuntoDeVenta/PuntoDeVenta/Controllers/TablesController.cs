@@ -20,21 +20,6 @@ namespace PuntoDeVenta.Controllers
             return View(db.Tables.ToList());
         }
 
-        // GET: Tables/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Table table = db.Tables.Find(id);
-            if (table == null)
-            {
-                return HttpNotFound();
-            }
-            return View(table);
-        }
-
         // GET: Tables/Create
         public ActionResult Create()
         {

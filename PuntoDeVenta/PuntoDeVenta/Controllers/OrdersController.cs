@@ -37,21 +37,6 @@ namespace PuntoDeVenta.Controllers
             return View(orders.ToList());
         }
 
-        // GET: Orders/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Order order = db.Orders.Find(id);
-            if (order == null)
-            {
-                return HttpNotFound();
-            }
-            return View(order);
-        }
-
         [HttpPost]
         public ActionResult OrdersPost(List<Order> orders)
         {

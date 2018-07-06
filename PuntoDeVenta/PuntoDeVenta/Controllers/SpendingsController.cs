@@ -20,21 +20,6 @@ namespace PuntoDeVenta.Controllers
             return View(db.Spendings.ToList());
         }
 
-        // GET: Spendings/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Spending spending = db.Spendings.Find(id);
-            if (spending == null)
-            {
-                return HttpNotFound();
-            }
-            return View(spending);
-        }
-
         // GET: Spendings/Create
         public ActionResult Create()
         {
