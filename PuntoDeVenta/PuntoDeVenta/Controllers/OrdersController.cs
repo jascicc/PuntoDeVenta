@@ -24,31 +24,72 @@ namespace PuntoDeVenta.Controllers
         public ActionResult List()
         {
             var orders = db.Orders.Where(x => x.Active == "POR PAGAR").Include(o => o.Product).Include(o => o.Table);
-            var dis = new List<string>();
+            StaticConfig staticConfig = db.StaticConfig.FirstOrDefault();
+
+            var ids = new List<string>();
+            var numbers = new List<int>();
             foreach (var item in orders)
             {
-                if (!dis.Contains(item.GroupID))
+                if (!ids.Contains(item.GroupID))
                 {
-                    dis.Add(item.GroupID);
+                    ids.Add(item.GroupID);
+                }
+                if (!numbers.Contains(item.Table.TableNumber))
+                {
+                    numbers.Add(item.Table.TableNumber);
                 }
             }
-            ViewBag.dis = dis;
+            ViewBag.ids = ids;
+            ViewBag.numbers = numbers;
+            ViewBag.staticConfig = staticConfig;
 
             return View(orders.ToList());
         }
 
+        public ActionResult Paid()
+        {
+            var orders = db.Orders.Where(x => x.Active == "PAGADO").Include(o => o.Product).Include(o => o.Table);
+            var ids = new List<string>();
+            foreach (var item in orders)
+            {
+                if (!ids.Contains(item.GroupID))
+                {
+                    ids.Add(item.GroupID);
+                }
+            }
+            ViewBag.ids = ids;
+
+            return View(orders.ToList());
+        }
         [HttpPost]
         public ActionResult OrdersPost(List<Order> orders)
         {
-            var date = DateTime.Now;
-            var active = "POR PAGAR";
-            foreach (var item in orders)
+            if (db.Orders.Where(o => (o.TableId == orders.First().TableId && o.Active == "POR PAGAR")).ToList().Count == 0)
             {
-                item.Active = active;
-                item.Date = date;
-                item.GroupID = (date.ToString() + item.TableId.ToString()).Replace("/", null).Replace(" ", null).Replace(":", null).Replace(".", null);
-                db.Orders.Add(item);
+                var date = DateTime.Now;
+                var active = "POR PAGAR";
+                foreach (var item in orders)
+                {
+                    item.Active = active;
+                    item.Date = date;
+                    item.GroupID = (date.ToString() + item.TableId.ToString()).Replace("/", null).Replace(" ", null).Replace(":", null).Replace(".", null);
+                    db.Orders.Add(item);
+                }
             }
+            else
+            {
+                var groupID = db.Orders.Where(o => (o.TableId == orders.First().TableId && o.Active == "POR PAGAR")).ToList().First().GroupID;
+                var date = DateTime.Now;
+                var active = "POR PAGAR";
+                foreach (var item in orders)
+                {
+                    item.Active = active;
+                    item.Date = date;
+                    item.GroupID = groupID;
+                    db.Orders.Add(item);
+                }
+            }
+
             try
             {
                 db.SaveChanges();
@@ -62,9 +103,9 @@ namespace PuntoDeVenta.Controllers
         }
 
         //Orders/Pay/:id
-        public ActionResult Pay(string id)
+        public ActionResult Pay(int num)
         {
-            var orders = db.Orders.Where(o => o.GroupID == id);
+            var orders = db.Orders.Where(o => o.TableId == num);
             foreach (var order in orders)
             {
                 order.Active = "PAGADO";
@@ -82,7 +123,7 @@ namespace PuntoDeVenta.Controllers
             ViewBag.products = db.Products.ToList();
             ViewBag.tables = db.Tables.ToList().OrderBy(a => a.TableNumber);
             var busy = new List<int>();
-            foreach (var item in db.Orders.Where(x => x.Active == "POR PAGAR").Include(o => o.Product).Include(o => o.Table))
+            foreach (var item in db.Orders.Where(x => x.Active == "POR PAGAR").Include(o => o.Table))
             {
                 if (!busy.Contains(item.Table.TableNumber))
                 {
@@ -92,114 +133,6 @@ namespace PuntoDeVenta.Controllers
             ViewBag.busy = busy;
 
             return View();
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "OrderId,TableId,ProductId,Quantity,Date,Active")] Order order)
-        {
-            order.Active = "por pagar";
-            if (ModelState.IsValid)
-            {
-                order.Date = DateTime.Now;
-                //db.Orders.Add(order);
-                //db.SaveChanges();
-                //return RedirectToAction("List");
-            }
-
-            ViewBag.categories = db.Categories.ToList();
-            ViewBag.products = db.Products.ToList();
-            return View(order);
-        }
-
-        ////GET: Orders/Create1
-        //public ActionResult Create1()
-        //{
-        //    ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
-        //    ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber");
-        //    return View();
-        //}
-
-        //// POST: Orders/Create
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Create1([Bind(Include = "OrderId,TableId,ProductId,Quantity,Date,Active")] Order order)
-        //{
-        //    order.Active = "por pagar";
-        //    if (ModelState.IsValid)
-        //    {
-        //        order.Date = DateTime.Now;
-        //        db.Orders.Add(order);
-        //        db.SaveChanges();
-        //        return RedirectToAction("List");
-        //    }
-
-        //    ViewBag.ProductId = new SelectList(db.Products, "ProductID", "ProductName");
-        //    ViewBag.TableId = new SelectList(db.Tables, "TableId", "TableNumber", order.TableId);
-        //    return View(order);
-        //}
-
-        // GET: Orders/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Order order = db.Orders.Find(id);
-            if (order == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.ProductId = new SelectList(db.Products, "ProductId", "Name", order.ProductID);
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "Name", order.TableId);
-            return View(order);
-        }
-
-        // POST: Orders/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "OrderId,TableId,ProductId,Quantity,Date")] Order order)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(order).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            ViewBag.ProductId = new SelectList(db.Products, "ProductId", "Name", order.ProductID);
-            ViewBag.TableId = new SelectList(db.Tables, "TableId", "Name", order.TableId);
-            return View(order);
-        }
-
-        // GET: Orders/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Order order = db.Orders.Find(id);
-            if (order == null)
-            {
-                return HttpNotFound();
-            }
-            return View(order);
-        }
-
-        // POST: Orders/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Order order = db.Orders.Find(id);
-            db.Orders.Remove(order);
-            db.SaveChanges();
-            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)

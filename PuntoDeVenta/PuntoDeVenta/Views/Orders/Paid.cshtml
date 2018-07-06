@@ -1,0 +1,47 @@
+﻿@model IEnumerable<PuntoDeVenta.Models.Order>
+
+@{
+    ViewBag.Title = "Ordenes pagadas";
+}
+
+<h2>Ordenes pagadas</h2>
+
+<table class="table table-striped table-bordered">
+    <tr>
+        <th>
+            Productos en la orden
+        </th>
+        <th style="width: 100px">
+            @Html.DisplayNameFor(model => model.Table.TableNumber)
+        </th>
+        <th style="width: 250px">
+            @Html.DisplayNameFor(model => model.Date)
+        </th>
+    </tr>
+
+    @foreach (var id in ViewBag.ids)
+    {
+        <tr>
+            <td>
+                @{
+                    string _out = null;
+                    foreach (var item in Model)
+                    {
+                        if (item.GroupID == id)
+                        {
+                            _out += item.Quantity + " " + item.Product.ProductName + ", ";
+                        }
+                    }
+                }
+                @_out.Substring(0, _out.Length - 2).
+            </td>
+            <td>
+                @Model.Where(x => x.GroupID == id).First().Table.TableNumber
+            </td>
+            <td>
+                @Model.Where(x => x.GroupID == id).First().Date
+            </td>
+        </tr>
+    }
+
+</table>

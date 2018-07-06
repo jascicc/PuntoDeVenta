@@ -1,19 +1,21 @@
 ﻿@model IEnumerable<PuntoDeVenta.Models.Order>
 @{
+    /**/
+
     ViewBag.Title = "Lista de ordenes";
     float total = 0f;
 }
 <h2>Lista de ordenes por pagar</h2>
-<p>
-    @*@Html.ActionLink("Agregar nuevo", "Create")*@
-</p>
-@foreach (var dis in ViewBag.dis)
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+@foreach (var id in ViewBag.ids)
 {
-    <button class="collapsible">MESA @Model.Where(a => a.GroupID == dis).First().Table.TableNumber</button>
+    total = 0;
+    <button class="collapsible">MESA @Model.Where(a => a.GroupID == id).First().Table.TableNumber</button>
     <div class="content">
         @foreach (var item in Model)
         {
-            if (item.GroupID == dis)
+            if (item.GroupID == id)
             {
                 <dl class="dl-horizontal">
 
@@ -43,18 +45,164 @@
 
             }
         }
-        @*<input class="right" type="submit" value="Pagar" onclick="@Url.Action("Pay", new { id = @Model.Where(a => a.GroupID == dis).First().GroupID })"/>*@
         <div class="payDiv">
-            @Html.ActionLink("Pagar", "Pay", new { id = @Model.Where(a => a.GroupID == dis).First().GroupID }, new { @class = "pay" })
+            @{
+                float doll = ViewBag.staticConfig.Dollar;
+                string tot = (total / doll).ToString();
+                tot = tot.Substring(0, tot.IndexOf('.') + 3);
+            }
+            @*@Html.ActionLink("Pagar", "Pay", new { num = @Model.Where(a => a.GroupID == id).First().TableId }, new { @class = "btn-lg pay" })*@
+            <button class="btn btn-lg pay" onclick="(currentOrder('@id', @total, @tot))" data-toggle="modal" data-target="#myModal">Cobrar</button>
             <label class="total">
-                Total: $@total
+                Pesos: &#36;@total
+            </label>
+            <label class="total">
+                Dólares: &#36;@tot
             </label>
         </div>
-        @*<input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />*@
     </div>
 }
 
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+                <h3 class="modal-title">Pagar</h3>
+            </div>
+            <div class="modal-body">
+                <div id="cont" class="row">
+                    <div class="col type" style="width: 180px;">
+                        <button onclick="typeOfPay('efectivo')">
+                            <i class="fa fa-4x fa-dollar"></i>
+                            Efectivo
+                        </button>
+                        <button onclick="typeOfPay('tarjeta')">
+                            <i class="fa fa-4x fa-credit-card"></i>
+                            Tarjeta
+                        </button>
+                        <button id="moneda" style="font-size:25px;" onclick="changeType()">
+                            Pesos
+                        </button>
+                    </div>
+
+                    <div class="col">
+                        <div class="row">
+                            <input class="myInput" type="number" id="result" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+                        </div>
+
+                        <div class="row">
+                            <div class="col">
+                                <div class="button-row">
+                                    <input type="button" value="7" onclick="myfunction('7')" />
+                                    <input type="button" value="8" onclick="myfunction('8')" />
+                                    <input type="button" value="9" onclick="myfunction('9')" />
+
+                                </div>
+                                <div class="button-row">
+                                    <input type="button" value="4" onclick="myfunction('4')" />
+                                    <input type="button" value="5" onclick="myfunction('5')" />
+                                    <input type="button" value="6" onclick="myfunction('6')" />
+                                </div>
+                                <div class="button-row">
+                                    <input type="button" value="1" onclick="myfunction('1')" />
+                                    <input type="button" value="2" onclick="myfunction('2')" />
+                                    <input type="button" value="3" onclick="myfunction('3')" />
+                                </div>
+                                <div class="button-row">
+                                    <input type="button" class="zero" value="0" onclick="myfunction('0')" />
+                                    <input type="button" value="." onclick="myfunction('.')" />
+                                </div>
+                            </div>
+                            <div class="col">
+                                <input type="button" class="back" value="&#8592;" onclick="myfunction('back')" />
+                                <input type="button" class="clear" value="CE" onclick="myfunction('ce')" />
+                                <input type="button" class="enter" value="&#8626;" onclick="cobrar()" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label id="cambio"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                <input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
+    var typePay = 'efectivo';
+    var typeMoney = 'pesos';
+    var currentId = '';
+    var totalPesos = parseFloat('0.00001');
+    var totalDollar = parseFloat('0.00001');
+    var doll = '@ViewBag.staticConfig.Dollar';
+
+    function cobrar() {
+        var pago = parseInt(document.getElementById('result').value);
+        if (typeMoney == 'pesos') {
+            var cambio = pago - totalPesos;
+            document.getElementById('cambio').innerHTML = 'Cambio: $' + cambio;
+
+        } else {
+            var cambio = (pago * parseFloat(doll)) - totalPesos;
+            var cambioD = pago - totalDollar;
+            document.getElementById('cambio').innerHTML = 'Cambio en pesos: $' + cambio + '     Cambio en dólar: ' + cambioD;
+
+        }
+    }
+
+    function typeOfPay(t) {
+        typePay = t;
+    }
+
+    function changeType() {
+        if (typeMoney == 'dollar') {
+            typeMoney = 'pesos';
+            document.getElementById('moneda').innerHTML = 'Pesos';
+
+        } else {
+            typeMoney = 'dollar';
+            document.getElementById('moneda').innerHTML = 'Dólares';
+        }
+    }
+
+    function currentOrder(id, pesos, dolares) {
+        currentId = id;
+        totalPesos = parseInt(pesos);
+        totalDollar = parseInt(dolares);
+    }
+
+    function myfunction(param) {
+        var text = document.getElementById('result').value;
+        switch (param) {
+            case 'ce':
+                document.getElementById('result').value = '';
+                document.getElementById('result').innerHTML = '';
+                break;
+            case 'back':
+                document.getElementById('result').value = text.substring(0, text.length - 1);
+                document.getElementById('result').innerHTML = text.substring(0, text.length - 1);
+                break;
+            case '.':
+                if (text.indexOf('.') === -1) {
+                    document.getElementById('result').value += param;
+                    document.getElementById('result').innerHTML += param;
+                }
+                break;
+            default:
+                document.getElementById('result').value += param;
+                document.getElementById('result').innerHTML += param;
+                break;
+        }
+    }
+
     var coll = document.getElementsByClassName("collapsible");
     var i;
 
@@ -81,9 +229,118 @@
             }
         });
     }
+
+    function submit(id) {
+        $.ajax({
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            type: "POST",
+            url: "/Orders/Pay",
+            data: id,
+            success: function (returndata) {
+                if (returndata.ok) {
+                    window.location = returndata.newurl;
+                } else {
+                    alertify.notify(returndata.message, 'error', 10, function () { }).dismissOthers();
+                }
+            }
+        })
+    }
 </script>
+
 <style>
-    /* Style the button that is used to open and close the collapsible content */
+    .myInput::-ms-clear {
+        display: none;
+    }
+    #cont {
+        align-content: center;
+    }
+
+    .type {
+        margin-right: 20px;
+    }
+
+    span i {
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .type button {
+        width: 150px;
+        height: 80px;
+        border: none;
+        border-radius: 10px;
+        background-color: gray;
+        color: white;
+        margin: 2px;
+        font-weight: 500;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .myInput {
+        background-color: gray;
+        max-width: 1000px !important;
+        width: 310px;
+        height: 80px;
+        font-size: 40px;
+        cursor: pointer;
+        margin: 2px;
+        text-align: right;
+    }
+
+    .button-row {
+        display: flex;
+        flex-direction: row;
+    }
+
+    input[type=button] {
+        width: 80px;
+        height: 40px;
+        border: none;
+        border-radius: 10px;
+        background-color: gray;
+        color: white;
+        margin: 2px;
+        font-weight: 500;
+    }
+
+    .zero {
+        margin: 2px;
+        width: 164px !important;
+        height: 40px !important;
+        border: none;
+        background-color: gray;
+        border-radius: 10px;
+    }
+
+    .back, .clear {
+        width: 60px !important;
+    }
+
+    .enter {
+        margin: 2px;
+        width: 60px !important;
+        height: 84px !important;
+        border: none;
+        background-color: gray;
+        border-radius: 10px;
+        color: white;
+        font-size: 25px;
+        font-weight: 500;
+    }
+
+
     .collapsible {
         background-color: rgb(204, 204, 204);
         color: rgb(20, 20, 20);
@@ -98,11 +355,10 @@
         margin-top: 10px;
     }
 
-        /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
         .collapsible:hover {
             background-color: #ccc;
         }
-    /* Style the collapsible content. Note: hidden by default */
+
     .content {
         position: relative;
         width: 80%;
@@ -110,6 +366,7 @@
         padding: 0 18px;
         background-color: rgb(245, 245, 245);
         max-height: 0;
+        min-height: 150px;
         overflow: hidden;
         transition: all 0.2s ease-out;
     }
@@ -118,7 +375,8 @@
         position: relative;
         margin-top: 5px;
         font-size: 22px;
-        float: left;
+        float: right;
+        right: 0;
     }
 
     .payDiv {
@@ -133,7 +391,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100px;
+        /*width: 100px;*/
         height: 40px;
         position: relative;
         background: #428bca;
@@ -142,8 +400,9 @@
         float: left;
     }
 
-        .pay:hover {
-            text-decoration: none;
+        .pay:hover, .pay:focus {
+            filter: invert(10%);
             color: white;
+            text-decoration: none;
         }
 </style>
