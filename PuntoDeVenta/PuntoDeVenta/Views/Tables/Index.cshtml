@@ -23,9 +23,17 @@
             @Html.DisplayFor(modelItem => item.TableNumber)
         </td>
         <td>
-            @Html.ActionLink("Editar", "Edit", new { id=item.TableId }) |
-            @Html.ActionLink("Detalles", "Details", new { id=item.TableId }) |
-            @Html.ActionLink("Eliminar", "Delete", new { id=item.TableId })
+            <a href="@Url.Action("Edit", new { id = item.TableId })">
+                <i class="fa fa-pencil"></i>
+                <span>Editar </span>
+            </a>
+            |
+            <a href="@Url.Action("Delete", new { id = item.TableId })">
+                <i class="fa fa-times"></i>
+                <span>Eliminar </span>
+            </a>
+            @*@Html.ActionLink("Editar", "Edit", new { id=item.TableId }) |
+            @Html.ActionLink("Eliminar", "Delete", new { id=item.TableId })*@
         </td>
     </tr>
 }
