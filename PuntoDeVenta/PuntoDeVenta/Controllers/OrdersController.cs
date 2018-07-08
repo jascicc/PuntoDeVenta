@@ -61,10 +61,13 @@ namespace PuntoDeVenta.Controllers
 
             return View(orders.ToList());
         }
+
         [HttpPost]
         public ActionResult OrdersPost(List<Order> orders)
         {
-            if (db.Orders.Where(o => (o.TableId == orders.First().TableId && o.Active == "POR PAGAR")).ToList().Count == 0)
+            var list = db.Orders.Where(o => o.Active == "POR PAGAR").ToList();
+            list = list.Where(o => o.TableId == orders.First().TableId).ToList();
+            if (list.Count == 0)
             {
                 var date = DateTime.Now;
                 var active = "POR PAGAR";
@@ -78,14 +81,15 @@ namespace PuntoDeVenta.Controllers
             }
             else
             {
-                var groupID = db.Orders.Where(o => (o.TableId == orders.First().TableId && o.Active == "POR PAGAR")).ToList().First().GroupID;
+                var id = list.First().GroupID;
+
                 var date = DateTime.Now;
                 var active = "POR PAGAR";
                 foreach (var item in orders)
                 {
                     item.Active = active;
                     item.Date = date;
-                    item.GroupID = groupID;
+                    item.GroupID = id;
                     db.Orders.Add(item);
                 }
             }
@@ -102,18 +106,27 @@ namespace PuntoDeVenta.Controllers
             }
         }
 
-        //Orders/Pay/:id
-        public ActionResult Pay(int num)
+        [HttpPost]
+        public ActionResult Pay(string id)
         {
-            var orders = db.Orders.Where(o => o.TableId == num);
+            var orders = db.Orders.Where(o => o.GroupID == id);
+            orders = orders.Where(o => o.Active == "POR PAGAR");
             foreach (var order in orders)
             {
                 order.Active = "PAGADO";
                 db.Entry(order).State = EntityState.Modified;
             }
-            db.SaveChanges();
 
-            return RedirectToAction("List");
+            try
+            {
+                db.SaveChanges();
+                return Json(new { ok = true, newurl = Url.Action("List") });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { ok = false, message = ex });
+
+            }
         }
 
         // GET: Orders/Create
