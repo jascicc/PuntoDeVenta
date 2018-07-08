@@ -4,6 +4,7 @@
 
     ViewBag.Title = "Lista de ordenes";
     float total = 0f;
+    float doll = ViewBag.staticConfig.Dollar;
 }
 <h2>Lista de ordenes por pagar</h2>
 <script src="~/Scripts/jquery-1.10.2.min.js"></script>
@@ -47,7 +48,6 @@
         }
         <div class="payDiv">
             @{
-                float doll = ViewBag.staticConfig.Dollar;
                 string tot = (total / doll).ToString();
                 tot = tot.Substring(0, tot.IndexOf('.') + 3);
             }
@@ -129,7 +129,7 @@
             </div>
             <div class="modal-footer">
                 <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                <input type="submit" value="Submit" class="btn btn-success" id="btnSubmit" />
+                <input type="submit" value="Submit" class="btn btn-success" onclick="myfunction2()" />
             </div>
         </div>
     </div>
@@ -175,6 +175,7 @@
 
     function currentOrder(id, pesos, dolares) {
         currentId = id;
+        console.log(currentId);
         totalPesos = parseInt(pesos);
         totalDollar = parseInt(dolares);
     }
@@ -230,7 +231,11 @@
         });
     }
 
-    function submit(id) {
+    function myfunction2() {
+        var id = currentId;
+        console.log('entro');
+        id = JSON.stringify({ 'id': id });
+        console.log(id);
         $.ajax({
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
@@ -252,6 +257,7 @@
     .myInput::-ms-clear {
         display: none;
     }
+
     #cont {
         align-content: center;
     }
