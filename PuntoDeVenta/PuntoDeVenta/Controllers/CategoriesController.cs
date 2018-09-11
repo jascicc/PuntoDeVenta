@@ -10,6 +10,7 @@ using System.Web.Mvc;
 
 namespace PuntoDeVenta.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

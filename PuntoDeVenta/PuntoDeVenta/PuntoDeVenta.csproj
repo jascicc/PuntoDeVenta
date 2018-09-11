@@ -363,6 +363,7 @@
     <Content Include="Views\Orders\List.cshtml" />
     <Content Include="Views\Orders\Paid.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
+    <Content Include="Views\Account\RegisterCajero.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

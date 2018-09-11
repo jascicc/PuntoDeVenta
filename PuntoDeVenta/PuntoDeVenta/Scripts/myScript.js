@@ -1,11 +1,18 @@
 ﻿var orders = [];
 var table = false;
+var tableid = 0;
+var tabletype = 0;
+
+window.onload = function () {
+    display('3');
+}
+
 function addToCart(id) {
     var order = {};
     order.ProductID = id;
     order.ProductName = document.getElementById("name " + id).innerText;
     order.Quantity = 1;
-    order.TableId = 0;
+    order.TableId = tableid;
 
     if (orders.filter(a => a.ProductID == id).length == 0) {
         orders.push(order);
@@ -21,7 +28,7 @@ function addToCart(id) {
 
         cell1.innerHTML = order.ProductName;
         cell2.innerHTML = order.Quantity;
-        cell3.innerHTML = '<a class="rmvItem" onclick=rmvItem(' + id + ') >&minus;</a> ' + '<a class="addItem" onclick=addItem(' + id + ') >&plus;</a>';
+        cell3.innerHTML = '<button class="rmvItem" onclick=rmvItem(' + id + ') >&minus;</button> ' + '<button class="addItem" onclick=addItem(' + id + ') >&plus;</button>';
 
         cell4.innerHTML = '<a class="close dngr" onclick=rmv(' + id + ') >&times;</a>';
 
@@ -78,9 +85,27 @@ function rmv(id) {
 }
 
 function selectTable(id, number) {
+    if (tableid !== 0) {
+
+        if (tabletype == 1) {
+            document.getElementById("table " + tableid).className = "taable";
+        } else {
+            document.getElementById("table " + tableid).className = "taable busy";
+        }
+    }
+    var classname = document.getElementById("table " + id).className;
+    tableid = id;
+    if (classname == "taable busy") {
+        tabletype = 2;
+    } else {
+        tabletype = 1;
+    }
     for (const key in orders) {
         orders[key].TableId = id;
     }
+
+    document.getElementById("table " + id).className = "taable actual";
+
     alertify.set('notifier', 'position', 'top-center');
     alertify.notify('Se ha seleccionado la mesa No. ' + number, 'success', 3, function () { }).dismissOthers();
     table = true;

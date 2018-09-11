@@ -10,6 +10,7 @@ using PuntoDeVenta.Models;
 
 namespace PuntoDeVenta.Controllers
 {
+    [Authorize(Roles = "Cajero,Admin")]
     public class OrdersController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -132,7 +133,21 @@ namespace PuntoDeVenta.Controllers
         // GET: Orders/Create
         public ActionResult Create()
         {
-            ViewBag.categories = db.Categories.ToList().OrderBy(c => c.CategoryName);
+            //algo como esto o darlos de alta por ordern
+            List<Category> categories = db.Categories.ToList();
+            List<Category> ls = new List<Category>
+            {
+                categories.Where(c => c.CategoryName.ToLower() == "tacos").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "quesadillas").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "burros").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "órdenes").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "kilos de carne").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "bebidas").First(),
+                categories.Where(c => c.CategoryName.ToLower() == "extras").First()
+            };
+            ViewBag.categories = ls;
+
+            //ViewBag.categories = db.Categories.ToList();
             ViewBag.products = db.Products.ToList();
             ViewBag.tables = db.Tables.ToList().OrderBy(a => a.TableNumber);
             var busy = new List<int>();

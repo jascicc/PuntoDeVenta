@@ -51,7 +51,6 @@
                 string tot = (total / doll).ToString();
                 tot = tot.Substring(0, tot.IndexOf('.') + 3);
             }
-            @*@Html.ActionLink("Pagar", "Pay", new { num = @Model.Where(a => a.GroupID == id).First().TableId }, new { @class = "btn-lg pay" })*@
             <button class="btn btn-lg pay" onclick="(currentOrder('@id', @total, @tot))" data-toggle="modal" data-target="#myModal">Cobrar</button>
             <label class="total">
                 Pesos: &#36;@total
@@ -82,42 +81,42 @@
                             <i class="fa fa-4x fa-credit-card"></i>
                             Tarjeta
                         </button>
-                        <button id="moneda" style="font-size:25px;" onclick="changeType()">
+                        <button id="moneda" onclick="changeType()">
                             Pesos
                         </button>
                     </div>
 
                     <div class="col">
                         <div class="row">
-                            <input class="myInput" type="number" id="result" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
+                            <input class="myInput" type="text" id="result" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />
                         </div>
 
                         <div class="row">
                             <div class="col">
                                 <div class="button-row">
-                                    <input type="button" value="7" onclick="myfunction('7')" />
-                                    <input type="button" value="8" onclick="myfunction('8')" />
-                                    <input type="button" value="9" onclick="myfunction('9')" />
+                                    <input type="button" value="7" onclick="addText('7')" />
+                                    <input type="button" value="8" onclick="addText('8')" />
+                                    <input type="button" value="9" onclick="addText('9')" />
 
                                 </div>
                                 <div class="button-row">
-                                    <input type="button" value="4" onclick="myfunction('4')" />
-                                    <input type="button" value="5" onclick="myfunction('5')" />
-                                    <input type="button" value="6" onclick="myfunction('6')" />
+                                    <input type="button" value="4" onclick="addText('4')" />
+                                    <input type="button" value="5" onclick="addText('5')" />
+                                    <input type="button" value="6" onclick="addText('6')" />
                                 </div>
                                 <div class="button-row">
-                                    <input type="button" value="1" onclick="myfunction('1')" />
-                                    <input type="button" value="2" onclick="myfunction('2')" />
-                                    <input type="button" value="3" onclick="myfunction('3')" />
+                                    <input type="button" value="1" onclick="addText('1')" />
+                                    <input type="button" value="2" onclick="addText('2')" />
+                                    <input type="button" value="3" onclick="addText('3')" />
                                 </div>
                                 <div class="button-row">
-                                    <input type="button" class="zero" value="0" onclick="myfunction('0')" />
-                                    <input type="button" value="." onclick="myfunction('.')" />
+                                    <input type="button" class="zero" value="0" onclick="addText('0')" />
+                                    <input type="button" value="." onclick="addText('.')" />
                                 </div>
                             </div>
                             <div class="col">
-                                <input type="button" class="back" value="&#8592;" onclick="myfunction('back')" />
-                                <input type="button" class="clear" value="CE" onclick="myfunction('ce')" />
+                                <input type="button" class="back" value="&#8592;" onclick="addText('back')" />
+                                <input type="button" class="clear" value="CE" onclick="addText('ce')" />
                                 <input type="button" class="enter" value="&#8626;" onclick="cobrar()" />
                             </div>
                         </div>
@@ -129,7 +128,7 @@
             </div>
             <div class="modal-footer">
                 <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
-                <input type="submit" value="Submit" class="btn btn-success" onclick="myfunction2()" />
+                <input type="submit" value="Submit" class="btn btn-success" onclick="addText2()" />
             </div>
         </div>
     </div>
@@ -140,8 +139,8 @@
     var typePay = 'efectivo';
     var typeMoney = 'pesos';
     var currentId = '';
-    var totalPesos = parseFloat('0.00001');
-    var totalDollar = parseFloat('0.00001');
+    var totalPesos;
+    var totalDollar;
     var doll = '@ViewBag.staticConfig.Dollar';
 
     function cobrar() {
@@ -153,7 +152,8 @@
         } else {
             var cambio = (pago * parseFloat(doll)) - totalPesos;
             var cambioD = pago - totalDollar;
-            document.getElementById('cambio').innerHTML = 'Cambio en pesos: $' + cambio + '     Cambio en dólar: ' + cambioD;
+            var camD = cambioD.toString().substring(0, cambioD.toString().indexOf('.') + 3);
+            document.getElementById('cambio').innerHTML = 'Cambio en pesos: $' + cambio + '     Cambio en dólar: $' + camD;
 
         }
     }
@@ -177,10 +177,10 @@
         currentId = id;
         console.log(currentId);
         totalPesos = parseInt(pesos);
-        totalDollar = parseInt(dolares);
+        totalDollar = parseFloat(dolares);
     }
 
-    function myfunction(param) {
+    function addText(param) {
         var text = document.getElementById('result').value;
         switch (param) {
             case 'ce':
@@ -254,8 +254,21 @@
 </script>
 
 <style>
+    #moneda {
+        font-size: 25px;
+        line-height: 70px;
+    }
+
     .myInput::-ms-clear {
         display: none;
+    }
+
+    input[type=button]:focus, button:focus {
+        outline: none !important;
+    }
+
+    input[type=button]:active, button:active {
+        filter: invert(40%);
     }
 
     #cont {
@@ -300,7 +313,7 @@
         width: 310px;
         height: 80px;
         font-size: 40px;
-        cursor: pointer;
+        cursor: text;
         margin: 2px;
         text-align: right;
     }
@@ -321,6 +334,11 @@
         font-weight: 500;
     }
 
+        input[type=button]:focus, input[type=text]:focus {
+            outline: none !important;
+        }
+
+
     .zero {
         margin: 2px;
         width: 164px !important;
@@ -335,15 +353,9 @@
     }
 
     .enter {
-        margin: 2px;
         width: 60px !important;
         height: 84px !important;
-        border: none;
-        background-color: gray;
-        border-radius: 10px;
-        color: white;
         font-size: 25px;
-        font-weight: 500;
     }
 
 
@@ -352,7 +364,7 @@
         color: rgb(20, 20, 20);
         cursor: pointer;
         padding: 18px;
-        width: 80%;
+        width: 95%;
         text-align: left;
         font-weight: 500;
         outline: none;
@@ -367,7 +379,7 @@
 
     .content {
         position: relative;
-        width: 80%;
+        width: 95%;
         display: none;
         padding: 0 18px;
         background-color: rgb(245, 245, 245);
